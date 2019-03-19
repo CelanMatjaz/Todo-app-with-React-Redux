@@ -1,28 +1,48 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { connect } from 'react-redux';
+
+//Components
+import Todo from './components/Todo';
+import Input from './components/Input';
+
+//Action creators
+import { addTodo, removeTodo, getTodos, markTodo } from './store/actionCreators';
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+    componentDidMount(){
+        this.props.GetTodos();
+    }
+
+    render() {
+        const { todos, AddTodo, RemoveTodo, MarkTodo } = this.props;
+        const Todos = todos.map(todo => 
+            <Todo 
+                key={todo.id} 
+                todo={todo} 
+                remove={RemoveTodo}
+                mark={MarkTodo}
+            />
+        );
+
+        return (
+            <div className="App">
+                <h1>Todo app</h1>
+                <Input addTodo={AddTodo}/>
+                {Todos}
+            </div>
+        );
+    }
 }
 
-export default App;
+const mapStateToProps = state => ({
+    todos: state.todos
+});
+
+const mapDispatchToProps = dispatch => ({
+    AddTodo: text => {dispatch(addTodo(text))},
+    RemoveTodo: id => {dispatch(removeTodo(id))},
+    GetTodos: () => {dispatch(getTodos())},
+    MarkTodo: id => {dispatch(markTodo(id))},
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
